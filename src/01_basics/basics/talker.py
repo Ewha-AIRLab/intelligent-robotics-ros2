@@ -14,14 +14,14 @@ class TalkerNode(Node):
         # Queue size 10: buffer up to 10 messages if subscriber is slow
         self.publisher_ = self.create_publisher(String, 'topic', 10)
 
-        # Fire timer_callback every 0.5 seconds (2 Hz)
-        timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        # Fire talk every 0.5 seconds (2 Hz)
+        # Stored as instance variable — otherwise garbage collected
+        self.timer = self.create_timer(0.5, self.talk)
 
         # Counter to track how many messages have been published
         self.i = 0
 
-    def timer_callback(self):
+    def talk(self):
         msg = String()
         msg.data = 'Hello World: %d' % self.i
         self.publisher_.publish(msg)
