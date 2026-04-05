@@ -3,9 +3,9 @@
 Lecture materials for Intelligent Robotics — Ewha Womans University
 
 ### Instructor
-Daeun Song, Department of Artificial Intelligence, Ewha Womans University
+- [Daeun Song](https://robotics.ewha.ac.kr/), Department of Artificial Intelligence, Ewha Womans University
 
-Contact: songd@ewha.ac.kr
+- Contact: songd@ewha.ac.kr
 
 
 ## Environment
@@ -23,8 +23,8 @@ Each directory under `src/` corresponds to one lecture and is organized as a ROS
 ```
 ros2_ws/
 └── src/
-    ├── 01_basics/        # Lecture 01 — ROS2 Basics (nodes, topics, pub/sub)
-    ├── 02_*/             # Lecture 02 — ...
+    ├── 01_basics/        # Lecture 01
+    ├── 02_*/             # Lecture 02
     └── ...
 ```
 
