@@ -27,6 +27,6 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.5
-      Pitch: 0.6
+      Distance: 3.0
+      Pitch: 0.5
       Yaw: 0.8
