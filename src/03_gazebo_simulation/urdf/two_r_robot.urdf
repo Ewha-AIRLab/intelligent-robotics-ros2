@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<robot name="2R_robot">
+
+  <!-- world link fixes the robot base to the ground in Gazebo -->
+  <link name="world"/>
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child  link="base_link"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ───── Links ───── -->
+
+  <link name="base_link">
+    <visual>
+      <geometry><box size="0.1 0.1 0.1"/></geometry>
+      <material name="gray"><color rgba="0.5 0.5 0.5 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.1 0.1 0.1"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.001667" ixy="0" ixz="0"
+                              iyy="0.001667" iyz="0"
+                                             izz="0.001667"/>
+    </inertial>
+  </link>
+
+  <link name="link_1">
+    <visual>
+      <geometry><cylinder length="1.0" radius="0.05"/></geometry>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <material name="green"><color rgba="0 0.8 0 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder length="1.0" radius="0.05"/></geometry>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.083958" ixy="0" ixz="0"
+                               iyy="0.083958" iyz="0"
+                                              izz="0.001250"/>
+    </inertial>
+  </link>
+
+  <link name="link_2">
+    <visual>
+      <geometry><cylinder length="1.0" radius="0.05"/></geometry>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <material name="blue"><color rgba="0 0 0.8 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder length="1.0" radius="0.05"/></geometry>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.083958" ixy="0" ixz="0"
+                               iyy="0.083958" iyz="0"
+                                              izz="0.001250"/>
+    </inertial>
+  </link>
+
+  <!-- ───── Joints ───── -->
+
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child  link="link_1"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <axis   xyz="0 1 0"/>
+    <limit  lower="-3.14159" upper="3.14159" effort="100" velocity="1"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+
+  <joint name="joint_2" type="revolute">
+    <parent link="link_1"/>
+    <child  link="link_2"/>
+    <origin xyz="0 0 1.0" rpy="0 0 0"/>
+    <axis   xyz="0 1 0"/>
+    <limit  lower="-3.14159" upper="3.14159" effort="100" velocity="1"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+
+  <!-- ───── Gazebo Fortress ───── -->
+
+  <gazebo reference="link_1">
+    <material>
+      <ambient>0 0.8 0 1</ambient>
+      <diffuse>0 0.8 0 1</diffuse>
+      <specular>0 0.1 0 1</specular>
+    </material>
+  </gazebo>
+
+  <gazebo reference="link_2">
+    <material>
+      <ambient>0 0 0.8 1</ambient>
+      <diffuse>0 0 0.8 1</diffuse>
+      <specular>0 0 0.1 1</specular>
+    </material>
+  </gazebo>
+  
+  <gazebo>
+    <plugin filename="gz_ros2_control-system"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find gazebo_simulation)/config/two_r_robot_controllers.yaml</parameters>
+      <hold_joints>false</hold_joints>
+    </plugin>
+  </gazebo>
+
+  <!-- ───── ros2_control ───── -->
+
+  <ros2_control name="GazeboSimSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+    <joint name="joint_1">
+      <command_interface name="position">
+        <param name="min">-3.14159</param>
+        <param name="max">3.14159</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_2">
+      <command_interface name="position">
+        <param name="min">-3.14159</param>
+        <param name="max">3.14159</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+</robot>
