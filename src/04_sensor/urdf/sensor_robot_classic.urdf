@@ -246,10 +246,10 @@
       <ray>
         <scan>
           <horizontal>
-            <samples>360</samples>
+            <samples>36</samples>
             <resolution>1</resolution>
-            <min_angle>-3.14159</min_angle>
-            <max_angle>3.14159</max_angle>
+            <min_angle>-1.5708</min_angle>
+            <max_angle>1.5708</max_angle>
           </horizontal>
         </scan>
         <range>
@@ -275,7 +275,7 @@
 
   <!-- ───── 3D LiDAR sensor — VLP-16 equivalent (Gazebo Classic) ───── -->
 
-  <gazebo reference="laser_frame">
+  <!-- <gazebo reference="laser_frame">
     <sensor type="ray" name="lidar_3d">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
@@ -314,7 +314,7 @@
         <frame_name>laser_frame</frame_name>
       </plugin>
     </sensor>
-  </gazebo>
+  </gazebo> -->
 
   <!-- ───── RGB camera sensor (Gazebo Classic) ───── -->
 

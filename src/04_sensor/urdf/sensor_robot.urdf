@@ -244,7 +244,7 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.1</min>
+          <min>0.5</min>
           <max>10.0</max>
           <resolution>0.01</resolution>
         </range>
@@ -264,7 +264,7 @@
       <lidar>
         <scan>
           <horizontal>
-            <samples>1800</samples>        
+            <samples>180</samples>        
             <resolution>1</resolution>
             <min_angle>-3.14159</min_angle> 
             <max_angle>3.14159</max_angle>  

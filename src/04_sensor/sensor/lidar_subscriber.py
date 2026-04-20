@@ -12,6 +12,7 @@ class LidarSubscriber(Node):
             self.scan_callback,
             10,
         )
+        self._count = 0
         self.get_logger().info('LidarSubscriber started — listening on /scan')
 
     def scan_callback(self, msg: LaserScan):
@@ -26,8 +27,9 @@ class LidarSubscriber(Node):
         else:
             front_str = f'{front_range:.3f} m'
 
+        self._count += 1
         self.get_logger().info(
-            f'LiDAR — front: {front_str} '
+            f'[{self._count}] LiDAR — front: {front_str} '
             f'(index {front_index}/{len(msg.ranges) - 1})'
         )
 
