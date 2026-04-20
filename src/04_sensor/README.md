@@ -15,8 +15,8 @@ Simulates a differential-drive mobile robot equipped with a **2D LiDAR** and an 
 │   ├── sim_sensor_robot.launch.py          # Gazebo Fortress
 │   └── sim_sensor_robot_classic.launch.py  # Gazebo Classic
 ├── sensor/
-│   ├── lidar_subscriber.py      # Subscribes to /scan, logs range stats
-│   └── camera_subscriber.py    # Subscribes to /camera/image_raw, logs frame info
+│   ├── lidar_subscriber.py      # Subscribes to /scan, logs front-facing range
+│   └── camera_subscriber.py    # Subscribes to /camera/image_raw, displays via OpenCV
 ├── urdf/
 │   ├── sensor_robot.urdf        # Robot with Fortress sensor plugins
 │   └── sensor_robot_classic.urdf # Robot with Classic sensor plugins
@@ -37,7 +37,7 @@ Simulates a differential-drive mobile robot equipped with a **2D LiDAR** and an 
 | `laser_frame` | LiDAR mount, 0.1 m forward, 0.075 m above base |
 | `camera_frame` | Camera mount, 0.16 m forward, 0.06 m above base |
 
-### LiDAR
+<!-- ### LiDAR
 
 | Parameter | Value |
 |-----------|-------|
@@ -54,7 +54,7 @@ Simulates a differential-drive mobile robot equipped with a **2D LiDAR** and an 
 | Resolution | 640 × 480 |
 | FOV | 60° horizontal |
 | Rate | 30 Hz |
-| Format | R8G8B8 |
+| Format | R8G8B8 | -->
 
 ---
 
@@ -66,7 +66,7 @@ Simulates a differential-drive mobile robot equipped with a **2D LiDAR** and an 
 ros2 launch sensor sim_sensor_robot.launch.py
 ```
 
-### Topics
+<!-- ### Topics
 
 | Topic | Type | Direction |
 |-------|------|-----------|
@@ -78,7 +78,7 @@ ros2 launch sensor sim_sensor_robot.launch.py
 | `/joint_states` | `sensor_msgs/msg/JointState` | Gz → ROS |
 | `/cmd_vel` | `geometry_msgs/msg/Twist` | ROS → Gz |
 
-Bridge configuration is defined in `config/bridge.yaml`.
+Bridge configuration is defined in `config/bridge.yaml`. -->
 
 ---
 
@@ -90,7 +90,7 @@ Bridge configuration is defined in `config/bridge.yaml`.
 ros2 launch sensor sim_sensor_robot_classic.launch.py
 ```
 
-### Topics
+<!-- ### Topics
 
 Same topic names as Fortress. No bridge is needed — Classic plugins publish directly to ROS 2 topics.
 
@@ -99,7 +99,7 @@ Same topic names as Fortress. No bridge is needed — Classic plugins publish di
 | Diff drive | `libgazebo_ros_diff_drive.so` |
 | LiDAR | `libgazebo_ros_ray_sensor.so` |
 | RGB Camera | `libgazebo_ros_camera.so` |
-| Joint states | `libgazebo_ros_joint_state_publisher.so` |
+| Joint states | `libgazebo_ros_joint_state_publisher.so` | -->
 
 ---
 
@@ -107,7 +107,7 @@ Same topic names as Fortress. No bridge is needed — Classic plugins publish di
 
 ### LiDAR subscriber
 
-Logs minimum and maximum range from each scan.
+Subscribes to `/scan` and logs the front-facing range on every scan (index derived from `angle_min` / `angle_increment`).
 
 ```bash
 ros2 run sensor lidar_subscriber
@@ -115,13 +115,13 @@ ros2 run sensor lidar_subscriber
 
 ### Camera subscriber
 
-Logs frame number, resolution, encoding, and timestamp for each image.
+Subscribes to `/camera/image_raw`, converts each frame with `cv_bridge`, and displays it in an OpenCV window.
 
 ```bash
 ros2 run sensor camera_subscriber
 ```
 
----
+<!-- ---
 
 ## Teleoperation
 
@@ -137,4 +137,4 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 | `,` | Backward |
 | `j` | Rotate left |
 | `l` | Rotate right |
-| `k` | Stop |
+| `k` | Stop | -->
