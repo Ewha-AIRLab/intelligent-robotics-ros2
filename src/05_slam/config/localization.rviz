@@ -8,9 +8,11 @@ Panels:
         - /Map1
         - /LaserScan1
         - /RobotModel1
+        - /TF1
         - /PoseWithCovariance1
+        - /ParticleCloud1
       Splitter Ratio: 0.5
-    Tree Height: 208
+    Tree Height: 523
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -183,7 +185,7 @@ Visualization Manager:
           Value: true
         right_wheel:
           Value: true
-      Marker Scale: 0.5
+      Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -239,7 +241,23 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /pose
+        Value: /amcl_pose
+      Value: true
+    - Alpha: 1
+      Class: nav2_rviz_plugins/ParticleCloud
+      Color: 26; 95; 180
+      Enabled: true
+      Max Arrow Length: 0.5
+      Min Arrow Length: 0.05000000074505806
+      Name: ParticleCloud
+      Shape: Arrow (Flat)
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /particle_cloud
       Value: true
   Enabled: true
   Global Options:
@@ -313,7 +331,7 @@ Window Geometry:
   Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000001cb0000039efc0200000004fb000000100044006900730070006c006100790073010000003d0000015b000000c900fffffffb0000001200530065006c0065006300740069006f006e010000019e000000a80000005c00fffffffb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000024c000000a80000005c00fffffffb0000000a0056006900650077007301000002fa000000e1000000a400ffffff000005690000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000001cb0000039efc0200000004fb000000100044006900730070006c006100790073010000003d00000296000000c900fffffffb0000001200530065006c0065006300740069006f006e000000019e000000a80000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000001f0000000cf0000005c00fffffffb0000000a0056006900650077007301000002d900000102000000a400ffffff000005690000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Tool Properties:
