@@ -7,6 +7,15 @@ Lecture materials for Intelligent Robotics — Ewha Womans University
 
 - Contact: songd@ewha.ac.kr
 
+## Lectures
+
+| # | Package | Topic |
+|---|---------|-------|
+| 01 | `basics` | ROS2 Basics — nodes, topics, publisher/subscriber |
+| 02 | `robot_description` | Robot modeling — URDF, joint/link, robot_state_publisher |
+| 03 | `gazebo_simulation` | Gazebo Fortress simulation — differential drive, spawning |
+| 04 | `sensor` | Sensor simulation — 2D LiDAR, RGB/depth camera, ros_gz_bridge |
+| 05 | `slam` | SLAM & Localization — slam_toolbox (mapping), Nav2 AMCL (localization) |
 
 ## Environment
 
@@ -23,8 +32,11 @@ Each directory under `src/` corresponds to one lecture and is organized as a ROS
 ```
 ros2_ws/
 └── src/
-    ├── 01_basics/        # Lecture 01
-    ├── 02_*/             # Lecture 02
+    ├── 01_basics/
+    ├── 02_robot_description/
+    ├── 03_gazebo_simulation/
+    ├── 04_sensor/
+    ├── 05_slam/
     └── ...
 ```
 
@@ -44,7 +56,7 @@ source /opt/ros/humble/setup.bash
 ### 2. Clone this repository
 
 ```bash
-git clone <repo-url> ~/ros2_ws
+git clone https://github.com/Ewha-AIRLab/intelligent-robotics-ros2 ~/ros2_ws
 cd ~/ros2_ws
 ```
 
@@ -68,13 +80,6 @@ To build a single package:
 colcon build --packages-select <package_name>
 ```
 
-## Lectures
-
-| # | Package | Topic |
-|---|---------|-------|
-| 01 | `01_basics` | ROS2 Basics — nodes, topics, publisher/subscriber |
-
-> New packages will be added as the course progresses.
 
 ## Running Examples
 
