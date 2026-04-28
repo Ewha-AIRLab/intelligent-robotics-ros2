@@ -14,11 +14,10 @@ SPAWN_Y_RANGE = (-3.0, 3.0)
 
 
 def launch_setup(context, *args, **kwargs):
-    nav2_share   = get_package_share_directory('nav2')
-    sensor_share = get_package_share_directory('sensor')
-    slam_share   = get_package_share_directory('slam')
-
-    bt_navigator_share = get_package_share_directory('nav2_bt_navigator')
+    nav2_share          = get_package_share_directory('nav2')
+    sensor_share        = get_package_share_directory('sensor')
+    slam_share          = get_package_share_directory('slam')
+    bt_navigator_share  = get_package_share_directory('nav2_bt_navigator')
 
     world_path  = os.path.join(slam_share, 'worlds', 'slam_world.sdf')
     nav2_params = os.path.join(nav2_share,  'config', 'nav2_params.yaml')
