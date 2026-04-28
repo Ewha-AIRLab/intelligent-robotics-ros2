@@ -18,9 +18,13 @@ def launch_setup(context, *args, **kwargs):
     sensor_share = get_package_share_directory('sensor')
     slam_share   = get_package_share_directory('slam')
 
+    bt_navigator_share = get_package_share_directory('nav2_bt_navigator')
+
     world_path  = os.path.join(slam_share, 'worlds', 'slam_world.sdf')
     nav2_params = os.path.join(nav2_share,  'config', 'nav2_params.yaml')
     rviz_config = os.path.join(nav2_share,  'config', 'navigation.rviz')
+    bt_xml      = os.path.join(bt_navigator_share, 'behavior_trees',
+                               'navigate_to_pose_w_replanning_and_recovery.xml')
 
     map_yaml = LaunchConfiguration('map').perform(context)
 
@@ -113,7 +117,8 @@ def launch_setup(context, *args, **kwargs):
             package='nav2_bt_navigator',
             executable='bt_navigator',
             name='bt_navigator',
-            parameters=[nav2_params, {'use_sim_time': True}],
+            parameters=[nav2_params, {'use_sim_time': True,
+                                      'default_nav_to_pose_bt_xml': bt_xml}],
             output='screen',
         ),
 
