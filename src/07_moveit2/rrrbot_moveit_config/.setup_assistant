@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: moveit2
+    relative_path: urdf/rrrbot.urdf
+  srdf:
+    relative_path: config/RRRbot.srdf
+  package_settings:
+    author_name: Daeun Song
+    author_email: songd@ewha.ac.kr
+    generated_timestamp: 1777809527
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

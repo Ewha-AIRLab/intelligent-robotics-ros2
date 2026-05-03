@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="2R_robot">
+<robot name="RRbot">
 
   <!-- Links -->
   <link name="base_link"/>
@@ -10,8 +10,8 @@
         <cylinder length="1.0" radius="0.05"/>
       </geometry>
       <!-- Z-up -->
-      <!-- <origin xyz="0 0 0.5" rpy="0 0 0"/>  -->
-      <origin xyz="0.5 0 0" rpy="0 1.5708 0"/>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/> 
+      <!-- <origin xyz="0.5 0 0" rpy="0 1.5708 0"/> -->
       <material name="green">
         <color rgba="0 0.8 0 1"/>
       </material>
@@ -24,8 +24,8 @@
         <cylinder length="1.0" radius="0.05"/>
       </geometry>
       <!-- Z-up  -->
-      <!-- <origin xyz="0 0 0.5" rpy="0 0 0"/>     -->
-      <origin xyz="0.5 0 0" rpy="0 1.5708 0"/>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>    
+      <!-- <origin xyz="0.5 0 0" rpy="0 1.5708 0"/> -->
       <material name="blue">
         <color rgba="0 0 0.8 1"/>
       </material>
@@ -39,9 +39,9 @@
     <child  link="link_1"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <!-- Z-up  -->
-    <!-- <axis xyz="0 1 0"/> -->
-    <axis   xyz="0 0 1"/>
-    <limit  lower="-3.14159" upper="3.14159" effort="10" velocity="1"/>
+    <axis xyz="0 1 0"/>
+    <!-- <axis   xyz="0 0 1"/> -->
+    <limit  lower="-1.5" upper="1.5" effort="10" velocity="1"/>
   </joint>
 
   <!-- joint_2: link_1 -> link_2 — this is ¹₂T -->
@@ -49,11 +49,11 @@
     <parent link="link_1"/>
     <child  link="link_2"/>
     <!-- Z-up  -->
-    <!-- <origin xyz="0 0 1.0" rpy="0 0 0"/> -->
-    <origin xyz="1.0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 1.0" rpy="0 0 0"/>
+    <!-- <origin xyz="1.0 0 0" rpy="0 0 0"/> -->
     <!-- Z-up  -->
-    <!-- <axis xyz="0 1 0"/> -->
-    <axis   xyz="0 0 1"/>
+    <axis xyz="0 1 0"/>
+    <!-- <axis   xyz="0 0 1"/> -->
     <limit  lower="-3.14159" upper="3.14159" effort="10" velocity="1"/>
   </joint>
 
