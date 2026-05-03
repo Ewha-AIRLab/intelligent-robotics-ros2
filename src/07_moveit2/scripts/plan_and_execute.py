@@ -135,6 +135,7 @@ class PlanAndExecute(Node):
 
         req = MotionPlanRequest()
         req.group_name = PLANNING_GROUP
+        # req.planner_id = 'BITstar'  # Default planner is RRTConnect - set in param
         req.goal_constraints.append(g['constraints'])
         req.num_planning_attempts = 10
         req.allowed_planning_time = 10.0
