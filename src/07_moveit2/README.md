@@ -1,23 +1,18 @@
-# Lecture 7 — MoveIt2 with UR5e + Robotiq 2F-85
+# Lecture 7 — MoveIt2
 
-This lecture integrates a Universal Robots UR5e arm with a Robotiq 2F-85 parallel-jaw gripper using MoveIt2.
+This lecture demonstrates motion planning and collision avoidance with the Franka Panda robot using MoveIt2.
 
 ---
 
-## Prerequisites — MoveIt2 Getting Started
+## Prerequisites
 
-Before working through this lecture, complete the official MoveIt2 getting-started guide to install all dependencies and verify your environment:
-
-[MoveIt2 Getting Started](https://moveit.picknik.ai/main/doc/tutorials/getting_started/getting_started.html)
-
-Key steps from that guide:
+Install MoveIt2 for ROS 2 Humble:
 
 ```bash
-# Install MoveIt2 for ROS 2 Humble
 sudo apt install ros-humble-moveit
 ```
 
-Once MoveIt2 is installed you are ready to continue below.
+Reference: [MoveIt2 Getting Started](https://moveit.picknik.ai/main/doc/tutorials/getting_started/getting_started.html)
 
 ---
 
@@ -34,17 +29,27 @@ cd $(ros2 pkg prefix moveit_resources_panda_moveit_config)/share/moveit_resource
 ## Package layout
 
 ```
-07_moveit2/           # ROS2 package: moveit2
+07_moveit2/                     # ROS2 package: moveit2
 ├── launch/
+│   ├── demo.launch.py          # fake hardware + RViz
+│   ├── sim.launch.py           # Gazebo + MoveIt2 (collision avoidance)
+│   └── pick_and_place.launch.py# Gazebo + MoveIt2 (pick and place)
 ├── config/
 ├── urdf/
 ├── worlds/
+│   ├── table.sdf               # table + red obstacle wall
+│   └── pick_and_place.sdf      # table + green target box + blue place marker
+├── scripts/
+│   ├── scene_publisher.py      # publishes table + obstacle to MoveIt planning scene
+│   ├── plan_and_execute.py     # cycles between joint-space and Cartesian EE goals
+│   ├── pick_and_place.py       # full pick and place sequence with gripper
+│   └── print_ee_pose.py        # prints current EE pose (translation + quaternion)
 └── README.md
 ```
 
 ---
 
-## Step 1 — Build
+## Build
 
 ```bash
 cd ~/ros2_ws
@@ -55,34 +60,75 @@ source install/setup.bash
 
 ---
 
-## Step 2 — Run the quickstart demo (fake hardware)
+## Quickstart demo (fake hardware)
 
-Follows the tutorial at [MoveIt2 Quickstart in RViz](https://moveit.picknik.ai/main/doc/tutorials/quickstart_in_rviz/quickstart_in_rviz_tutorial.html):
+Runs the Panda in RViz with `mock_components/GenericSystem` — motion planning works without physics simulation:
 
 ```bash
 ros2 launch moveit2 demo.launch.py
 ```
 
-The robot runs with `mock_components/GenericSystem` — motion planning works in RViz, no physics simulation.
+Reference: [MoveIt2 Quickstart in RViz](https://moveit.picknik.ai/main/doc/tutorials/quickstart_in_rviz/quickstart_in_rviz_tutorial.html)
 
 ---
 
-## Step 3 — Generate MoveIt config with Setup Assistant
+## Collision avoidance demo
 
-To create a MoveIt config for a new robot, use the Setup Assistant:
+Launches Gazebo with a table and a red obstacle wall. The planning scene is automatically populated with matching collision objects:
 
-Tutorial: [MoveIt Setup Assistant](https://moveit.picknik.ai/main/doc/examples/setup_assistant/setup_assistant_tutorial.html)
+```bash
+# Terminal 1
+ros2 launch moveit2 sim.launch.py
+
+# Terminal 2 — cycles between a joint-space goal and a Cartesian EE pose goal
+ros2 run moveit2 plan_and_execute.py
+```
+
+Goals in `plan_and_execute.py`:
+- **Joint goal** — arm swept left of the obstacle wall (`joint1 = +1.0 rad`)
+- **Pose goal** — EE at `[0.559, -0.059, 0.972]` with fixed orientation, in front of the wall
+
+To read the current EE pose:
+```bash
+# Formatted translation + quaternion (polls every 0.5 s)
+ros2 run moveit2 print_ee_pose.py
+
+# Raw TF2 output
+ros2 run tf2_ros tf2_echo world panda_link8
+```
+
+---
+
+## Pick and place demo
+
+Launches Gazebo with a table, a green target box (pick), and a blue marker (place):
+
+```bash
+# Terminal 1
+ros2 launch moveit2 pick_and_place.launch.py
+
+# Terminal 2 — runs the full pick and place sequence
+ros2 run moveit2 pick_and_place.py
+```
+
+Sequence:
+1. Open gripper → pre-grasp (OMPL) → approach (Cartesian) → close gripper → attach object
+2. Lift (Cartesian) → transfer to place (OMPL) → place (Cartesian) → open gripper → detach → retreat (Cartesian) → home
+3. Return: pre-grasp from place (OMPL) → approach (Cartesian) → close gripper → attach → lift (Cartesian) → transfer back (OMPL) → place at origin (Cartesian) → open gripper → detach → retreat (Cartesian) → home
+
+Planner strategy mirrors MoveIt Task Constructor:
+- **Cartesian path** (`/compute_cartesian_path`) for straight-line EE motions (approach, lift, retreat)
+- **OMPL** (`/move_action`, IK → joint goal) for free-space transfers
+- **JointTrajectoryController** for the gripper (both fingers)
+
+---
+
+## MoveIt Setup Assistant
+
+To create a MoveIt config for a new robot:
 
 ```bash
 ros2 launch moveit_setup_assistant setup_assistant.launch.py
 ```
 
----
-
-## Step 4 — Run the Gazebo simulation
-
-Swaps fake hardware for `gz_ros2_control/GazeboSimSystem` and adds a Gazebo world with a table:
-
-```bash
-ros2 launch moveit2 sim.launch.py
-```
+Reference: [MoveIt Setup Assistant](https://moveit.picknik.ai/main/doc/examples/setup_assistant/setup_assistant_tutorial.html)
