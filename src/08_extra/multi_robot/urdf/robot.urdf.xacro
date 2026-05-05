@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<robot name="sensor_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="diff_drive_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- All Gazebo plugin topics and TF frame IDs are prefixed with this namespace.
-       Set via xacro argument at spawn time. -->
+  <!-- namespace is used only in Gazebo plugin topics and frame IDs.
+       URDF link names stay generic so robot_state_publisher can be
+       reused with any namespace via frame_prefix in the launch file. -->
   <xacro:arg name="namespace" default="robot"/>
   <xacro:property name="ns" value="$(arg namespace)"/>
 
@@ -144,7 +145,10 @@
     </friction></surface></collision>
   </gazebo>
 
-  <!-- ───── Diff drive — namespaced topics and frames ───── -->
+  <!-- ───── Diff drive ───── -->
+  <!-- Topics and TF frame IDs are namespaced; link names above stay generic.
+       frame_prefix in robot_state_publisher (set in launch) adds the namespace
+       to TF frames published from URDF. -->
 
   <gazebo>
     <plugin filename="gz-sim-diff-drive-system"
@@ -156,7 +160,7 @@
       <odom_publish_frequency>10</odom_publish_frequency>
       <topic>${ns}/cmd_vel</topic>
       <odom_topic>${ns}/odom</odom_topic>
-      <tf_topic>/tf</tf_topic>
+      <tf_topic>/${ns}/tf</tf_topic>
       <frame_id>${ns}/odom</frame_id>
       <child_frame_id>${ns}/base_link</child_frame_id>
       <max_linear_acceleration>1.0</max_linear_acceleration>
@@ -168,7 +172,7 @@
             name="gz::sim::systems::JointStatePublisher"/>
   </gazebo>
 
-  <!-- ───── 2D LiDAR — namespaced topic and frame ───── -->
+  <!-- ───── 2D LiDAR ───── -->
 
   <gazebo reference="laser_frame">
     <sensor name="laser" type="gpu_lidar">
@@ -186,7 +190,7 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.5</min>
+          <min>1.0</min>
           <max>10.0</max>
           <resolution>0.01</resolution>
         </range>

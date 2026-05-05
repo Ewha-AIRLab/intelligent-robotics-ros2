@@ -33,25 +33,36 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments=[('gz_args', f'-r {world_path}')],
     )
 
+    # Bridge the clock once here — robot_nav.launch.py must NOT bridge it
+    clock_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='clock_bridge',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen',
+    )
+
     robot1 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(robot_nav_launch),
         launch_arguments={
-            'namespace': 'robot1',
-            'x':   '-2.0',
-            'y':   '0.0',
-            'yaw': '0.0',
-            'map': map_yaml,
+            'namespace':   'robot1',
+            'x':           '-2.0',
+            'y':           '0.0',
+            'yaw':         '0.0',
+            'map':         map_yaml,
+            'nav2_delay':  '5.0',
         }.items(),
     )
 
     robot2 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(robot_nav_launch),
         launch_arguments={
-            'namespace': 'robot2',
-            'x':   '2.0',
-            'y':   '0.0',
-            'yaw': '3.14159',
-            'map': map_yaml,
+            'namespace':   'robot2',
+            'x':           '2.0',
+            'y':           '0.0',
+            'yaw':         '3.14159',
+            'map':         map_yaml,
+            'nav2_delay':  '15.0',
         }.items(),
     )
 
@@ -63,7 +74,7 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
     )
 
-    return [gazebo, robot1, robot2, rviz]
+    return [gazebo, clock_bridge, robot1, robot2, rviz]
 
 
 def generate_launch_description():

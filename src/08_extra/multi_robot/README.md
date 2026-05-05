@@ -106,9 +106,14 @@ This starts:
 
 Nav2 starts with a 5-second delay to allow the robots to spawn first.
 
-### 2. Set initial poses
+### 2. Wait for AMCL to initialize (optional - already done)
 
-Each robot needs an initial pose estimate for AMCL. In RViz, use **2D Pose Estimate** for each robot. Or via CLI:
+Each robot's AMCL auto-initializes at its spawn position (injected from the launch arguments).
+No manual initial pose is required. Wait for the particle clouds to appear in RViz (~5 s for
+robot1, ~15 s for robot2).
+
+If you need to manually correct a robot's pose, publish to its namespaced topic
+(the RViz "2D Pose Estimate" button publishes to `/initialpose` and will NOT reach namespaced nodes):
 
 ```bash
 # robot1
@@ -117,7 +122,7 @@ ros2 topic pub /robot1/initialpose geometry_msgs/msg/PoseWithCovarianceStamped \
 
 # robot2
 ros2 topic pub /robot2/initialpose geometry_msgs/msg/PoseWithCovarianceStamped \
-  "{header: {frame_id: map}, pose: {pose: {position: {x: 2.0, y: 0.0}, orientation: {w: 1.0}}}}" --once
+  "{header: {frame_id: map}, pose: {pose: {position: {x: 2.0, y: 0.0}, orientation: {z: 1.0, w: 0.0}}}}" --once
 ```
 
 ### 3. Send navigation goals
@@ -125,14 +130,16 @@ ros2 topic pub /robot2/initialpose geometry_msgs/msg/PoseWithCovarianceStamped \
 In RViz, select a robot's namespace context and use **2D Nav Goal**. Or via CLI:
 
 ```bash
-# Send robot1 to (3, 1)
+# Send robot1 to (2, 1)
 ros2 action send_goal /robot1/navigate_to_pose nav2_msgs/action/NavigateToPose \
-  "{pose: {header: {frame_id: map}, pose: {position: {x: 3.0, y: 1.0}, orientation: {w: 1.0}}}}"
+  "{pose: {header: {frame_id: map}, pose: {position: {x: 2.0, y: 1.0}, orientation: {w: 1.0}}}}"
 
-# Send robot2 to (-3, -1)
+# Send robot2 to (-2, -1)
 ros2 action send_goal /robot2/navigate_to_pose nav2_msgs/action/NavigateToPose \
-  "{pose: {header: {frame_id: map}, pose: {position: {x: -3.0, y: -1.0}, orientation: {w: 1.0}}}}"
+  "{pose: {header: {frame_id: map}, pose: {position: {x: -2.0, y: -1.0}, orientation: {w: 1.0}}}}"
 ```
+
+> The SLAM world is ~10 m × 10 m. Keep goals within roughly ±4 m from the origin to stay inside the map.
 
 ### 4. Teleoperate (optional)
 

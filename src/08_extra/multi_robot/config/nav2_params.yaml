@@ -38,7 +38,7 @@ amcl:
     set_initial_pose: true
     always_reset_initial_pose: false
     tf_broadcast: true
-    transform_tolerance: 1.0
+    transform_tolerance: 2.0
     recovery_alpha_slow: 0.0
     recovery_alpha_fast: 0.0
 

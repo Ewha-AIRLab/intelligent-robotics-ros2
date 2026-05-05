@@ -19,14 +19,15 @@ from nav2_common.launch import RewrittenYaml
 
 
 def launch_setup(context, *args, **kwargs):
-    ns      = LaunchConfiguration('namespace').perform(context)
-    x       = LaunchConfiguration('x').perform(context)
-    y       = LaunchConfiguration('y').perform(context)
-    yaw     = LaunchConfiguration('yaw').perform(context)
-    map_yaml = LaunchConfiguration('map').perform(context)
+    ns        = LaunchConfiguration('namespace').perform(context)
+    x         = LaunchConfiguration('x').perform(context)
+    y         = LaunchConfiguration('y').perform(context)
+    yaw       = LaunchConfiguration('yaw').perform(context)
+    map_yaml  = LaunchConfiguration('map').perform(context)
+    nav2_delay = float(LaunchConfiguration('nav2_delay').perform(context))
 
     pkg_share = get_package_share_directory('multi_robot')
-    xacro_path  = os.path.join(pkg_share, 'urdf', 'multi_robot.urdf.xacro')
+    xacro_path  = os.path.join(pkg_share, 'urdf', 'robot.urdf.xacro')
     params_path = os.path.join(pkg_share, 'config', 'nav2_params.yaml')
     bt_xml = os.path.join(
         get_package_share_directory('nav2_bt_navigator'),
@@ -86,8 +87,12 @@ def launch_setup(context, *args, **kwargs):
             f'/{ns}/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             f'/{ns}/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
             f'/{ns}/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
-            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            f'/world/sensor_world/model/{ns}/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model',
+            f'/{ns}/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+        ],
+        remappings=[
+            (f'/{ns}/tf', '/tf'),
+            (f'/world/sensor_world/model/{ns}/joint_state', f'/{ns}/joint_states'),
         ],
         output='screen',
     )
@@ -103,7 +108,12 @@ def launch_setup(context, *args, **kwargs):
              output='screen'),
 
         Node(package='nav2_amcl', executable='amcl', name='amcl',
-             parameters=[nav2_params, {'use_sim_time': True}],
+             parameters=[nav2_params, {
+                 'use_sim_time': True,
+                 'initial_pose.x':   float(x),
+                 'initial_pose.y':   float(y),
+                 'initial_pose.yaw': float(yaw),
+             }],
              output='screen'),
 
         Node(package='nav2_lifecycle_manager',
@@ -143,7 +153,7 @@ def launch_setup(context, *args, **kwargs):
              output='screen'),
     ])
 
-    return [rsp, bridge, spawn, TimerAction(period=5.0, actions=[nav2_nodes])]
+    return [rsp, bridge, spawn, TimerAction(period=nav2_delay, actions=[nav2_nodes])]
 
 
 def generate_launch_description():
@@ -156,5 +166,7 @@ def generate_launch_description():
             'map',
             default_value=os.path.expanduser('~/my_map.yaml'),
             description='Absolute path to a nav2 map YAML file'),
+        DeclareLaunchArgument('nav2_delay', default_value='5.0',
+                              description='Seconds to wait before starting Nav2'),
         OpaqueFunction(function=launch_setup),
     ])
