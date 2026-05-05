@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="actor_world">
+
+
+
+    <!-- Physics -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Required system plugins -->
+    <plugin filename="ignition-gazebo-physics-system"
+            name="gz::sim::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+    <!-- Needed to actually run sensors (LiDAR, IMU, etc.) each tick -->
+    <plugin filename="ignition-gazebo-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Publishes /actor/{name}/pose for every actor in the world -->
+    <plugin filename="ActorPosePublisher"
+            name="dynamic_actor::ActorPosePublisher"/>
+
+    <!--
+      Static collision model for walking_actor.
+      Parked underground at startup; AttachModelPlugin teleports it each tick
+      to match the actor's pose so Gazebo LiDAR / contact sensors detect it.
+      Remove the <visual> block to hide it in the GUI.
+    -->
+    <model name="walking_actor_collision">
+      <pose>0 0 -100 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0.35 0 1.5708 0 0</pose>
+          <geometry>
+            <cylinder><radius>0.3</radius><length>1.7</length></cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0 0.35 0 1.5708 0 0</pose>
+          <geometry>
+            <cylinder><radius>0.4</radius><length>1.7</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>1 0 0 0.4</ambient>
+            <diffuse>1 0 0 0.4</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Lighting -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>100 100</size></plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>100 100</size></plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <actor name="walking_actor">
+      <!-- Neutral pose; plugin takes over from tick 1. -->
+      <pose>0 0 0  0 0 0</pose>
+
+      <skin>
+        <filename>../meshes/actor.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+
+      <animation name="walking">
+        <filename>../meshes/actor.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+
+      <!-- TrajectoryActorPlugin drives movement at constant velocity.
+           No <script> block — this plugin owns all position state. -->
+      <plugin filename="TrajectoryActorPlugin"
+              name="dynamic_actor::TrajectoryActorPlugin">
+        <!-- Spawn pose (x y z roll pitch yaw).
+             x y z      = world start position
+             roll/pitch = mesh correction (1.5708 0 = Y-up DAE → +Z up)
+             yaw        = mesh correction to align native forward with +X -->
+        <init>-2.5 -2.5 0  1.5708 0 1.5708</init>
+        <!-- Trajectory waypoints (x y z roll pitch yaw).
+             Only position is used; yaw is computed from movement direction. -->
+        <target>-2.5 -2.5 0  0 0 0</target>
+        <target> 2.5 -2.5 0  0 0 0</target>
+        <target> 2.5  2.5 0  0 0 0</target>
+        <target>-2.5  2.5 0  0 0 0</target>
+        <velocity>1.0</velocity>
+        <collision_avoidance>
+          <ignore>walking_actor_collision</ignore>
+        </collision_avoidance>
+      </plugin>
+
+      <!-- AttachModelPlugin teleports the static collision model each tick -->
+      <plugin filename="AttachModelPlugin"
+              name="dynamic_actor::AttachModelPlugin">
+        <model_name>walking_actor_collision</model_name>
+      </plugin>
+    </actor>
+
+    <model name="lidar_test">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <sensor name="lidar" type="gpu_lidar">
+          <!-- Raise the scan plane to actor waist height (~0.5 m) -->
+          <pose>0 0 0.5 0 0 0</pose>
+          <topic>/scan</topic>
+          <update_rate>10</update_rate>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>360</samples>
+                <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+            </scan>
+            <range><min>0.1</min><max>10.0</max></range>
+          </lidar>
+        </sensor>
+      </link>
+    </model>
+    
+
+
+  </world>
+</sdf>
