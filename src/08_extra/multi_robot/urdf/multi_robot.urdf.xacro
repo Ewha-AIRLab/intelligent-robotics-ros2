@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<robot name="sensor_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- All Gazebo plugin topics and TF frame IDs are prefixed with this namespace.
+       Set via xacro argument at spawn time. -->
+  <xacro:arg name="namespace" default="robot"/>
+  <xacro:property name="ns" value="$(arg namespace)"/>
+
+  <!-- ───── Links ───── -->
+
+  <link name="base_link">
+    <visual>
+      <geometry><box size="0.3 0.2 0.1"/></geometry>
+      <material name="gray"><color rgba="0.5 0.5 0.5 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.3 0.2 0.1"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <inertia ixx="0.008333" ixy="0" ixz="0"
+                               iyy="0.016667" iyz="0"
+                                              izz="0.021667"/>
+    </inertial>
+  </link>
+
+  <link name="left_wheel">
+    <visual>
+      <geometry><cylinder length="0.05" radius="0.06"/></geometry>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <material name="black"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder length="0.05" radius="0.06"/></geometry>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000554" ixy="0" ixz="0"
+                               iyy="0.000900" iyz="0"
+                                              izz="0.000554"/>
+    </inertial>
+  </link>
+
+  <link name="right_wheel">
+    <visual>
+      <geometry><cylinder length="0.05" radius="0.06"/></geometry>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+      <material name="black"><color rgba="0 0 0 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder length="0.05" radius="0.06"/></geometry>
+      <origin rpy="1.5708 0 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.000554" ixy="0" ixz="0"
+                               iyy="0.000900" iyz="0"
+                                              izz="0.000554"/>
+    </inertial>
+  </link>
+
+  <link name="caster_wheel">
+    <visual>
+      <geometry><sphere radius="0.03"/></geometry>
+      <material name="gray"><color rgba="0.5 0.5 0.5 1"/></material>
+    </visual>
+    <collision>
+      <geometry><sphere radius="0.03"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.000036" ixy="0" ixz="0"
+                               iyy="0.000036" iyz="0"
+                                              izz="0.000036"/>
+    </inertial>
+  </link>
+
+  <link name="laser_frame">
+    <visual>
+      <geometry><cylinder length="0.04" radius="0.05"/></geometry>
+      <material name="red"><color rgba="0.8 0 0 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder length="0.04" radius="0.05"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.000076" ixy="0" ixz="0"
+                               iyy="0.000076" iyz="0"
+                                              izz="0.000125"/>
+    </inertial>
+  </link>
+
+  <!-- ───── Joints ───── -->
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="left_wheel"/>
+    <origin xyz="0.05 0.125 -0.05" rpy="0 0 0"/>
+    <axis   xyz="0 1 0"/>
+    <limit  effort="10" velocity="10"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child  link="right_wheel"/>
+    <origin xyz="0.05 -0.125 -0.05" rpy="0 0 0"/>
+    <axis   xyz="0 1 0"/>
+    <limit  effort="10" velocity="10"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <joint name="caster_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="caster_wheel"/>
+    <origin xyz="-0.1 0 -0.08" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="laser_frame"/>
+    <origin xyz="0.0 0 0.075" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ───── Gazebo: wheel friction ───── -->
+
+  <gazebo reference="left_wheel">
+    <collision><surface><friction>
+      <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+    </friction></surface></collision>
+  </gazebo>
+
+  <gazebo reference="right_wheel">
+    <collision><surface><friction>
+      <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+    </friction></surface></collision>
+  </gazebo>
+
+  <gazebo reference="caster_wheel">
+    <collision><surface><friction>
+      <ode><mu>0</mu><mu2>0</mu2></ode>
+    </friction></surface></collision>
+  </gazebo>
+
+  <!-- ───── Diff drive — namespaced topics and frames ───── -->
+
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.25</wheel_separation>
+      <wheel_radius>0.06</wheel_radius>
+      <odom_publish_frequency>10</odom_publish_frequency>
+      <topic>${ns}/cmd_vel</topic>
+      <odom_topic>${ns}/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>${ns}/odom</frame_id>
+      <child_frame_id>${ns}/base_link</child_frame_id>
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher"/>
+  </gazebo>
+
+  <!-- ───── 2D LiDAR — namespaced topic and frame ───── -->
+
+  <gazebo reference="laser_frame">
+    <sensor name="laser" type="gpu_lidar">
+      <gz_frame_id>${ns}/laser_frame</gz_frame_id>
+      <pose>0 0 0 0 0 0</pose>
+      <topic>${ns}/scan</topic>
+      <update_rate>10</update_rate>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.5</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+      <always_on>1</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+</robot>
